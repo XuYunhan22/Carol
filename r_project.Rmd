@@ -1,0 +1,648 @@
+---
+title: "wine_quality"
+author: "carol"
+date: "5/20/2019"
+output:
+  html_document: 
+    number_sections: yes
+    toc: yes
+  pdf_document: default
+---
+
+
+```{r , echo=FALSE}
+knitr::opts_chunk$set(echo=FALSE,messages = FALSE,warning =FALSE)
+Sys.setlocale('LC_ALL','C')
+library(gpairs)
+library(RColorBrewer)
+library(ggplot2)
+library(dplyr)
+library(knitr)
+library(GGally)
+```
+
+
+
+```{r , echo=FALSE}
+# Load the Datac
+df <- read.csv("wineQualityReds.csv")
+str(df)
+summary(df)
+```
+
+
+```
+这份报告探索了一个包含1599条红酒质量和其属性的数据集。本次项目目标是了解那些化学成分影响红葡萄酒的品质。
+有1599个酒的样本，13个特征：其中X为红葡萄酒编号，11个红葡萄酒理化特征(固定酸、挥发性酸、柠檬酸、剩余糖分、氯化物、游离二氧化硫、总二氧化硫、密度、pH值，硫酸盐和酒精)，另外1个为红酒质量。
+```
+
+# Univariate analysis 
+
+### 探索样本变量中的固定酸分布情况
+```{r , echo=FALSE}
+
+qplot(fixed.acidity, data=df)+
+  scale_x_continuous(breaks = seq(4,16,2))+
+labs(x = 'fixed.acidity', y = 'content(g / dm^3)', 
+       title = 'Bargraph for fixed.acidity of red wines')
+
+```
+
+
+```{r}
+summary(df$fixed.acidity)
+```
+红酒固定酸的含量集中在7-8g / dm^3之间，成正偏态分布
+
+
+
+### 探索样本变量中的挥发性酸分布情况
+```{r , echo=FALSE}
+qplot(volatile.acidity, data= df)+scale_x_continuous(breaks = seq(0,1.6,0.2))+
+  labs(x = 'volatile.acidity', y = 'content(g / dm^3)', 
+       title = 'Bargraph for volatile.acidity of red wines')
+```
+
+```{r}
+summary(df$volatile.acidity)
+```
+红酒挥发酸的含量集中在0.52g / dm^3，呈现右偏态分布.
+
+#3.探索样本变量中的柠檬酸分布情况
+```{r , echo=FALSE}
+qplot(citric.acid, data= df)+
+scale_x_continuous(breaks = seq(0.0,0.75,0.25), 
+                   limits = c(0.0,0.75)) + labs(x = 'citric.acid', y = 'content(g / dm^3)', 
+       title = 'Bargraph for vcitric.acid of red wines')
+  
+```
+
+```{r}
+summary(df$citric.acid)
+```
+红酒中柠檬酸的含量集中在0.26g / dm^3，整体呈现出比较分散的状态
+
+### 探索样本变量中的残糖分布情况
+```{r , echo=FALSE}
+qplot(x= residual.sugar, data= df)+
+  scale_x_continuous(breaks = seq(0.0,8,2), 
+                     limits = c(0.0,8))+labs(x = 'residual.sugar', y = 'content(g / dm^3)', 
+       title = 'Bargraph for residual.sugar of red wines')
+```
+
+```{r}
+summary(df$residual.sugar)
+```
+
+红酒中残糖的含量集中在2.20g / dm^3，呈现出正偏态分布
+
+### 探索样本变量中的氯化物分布情况
+```{r , echo=FALSE}
+#5.探索样本变量中的chlorides分布情况
+qplot(x= chlorides, data= df)+
+  scale_x_continuous(breaks = seq(0.0,0.2,0.02), 
+                     limits = c(0.0,0.2))+
+  labs(x = 'chlorides', y = 'content(g / dm^3)', 
+       title = 'Bargraph for chlorides of red wines')
+```
+
+```{r}
+summary(df$chlorides)
+```
+红酒中氯化物的含量集中在0.079g / dm^3，大致呈现出正态分布。
+
+### 探索样本变量中的酒中带硫元素的离子分布情况
+```{r , echo=FALSE}
+
+qplot(x= free.sulfur.dioxide, data= df)+labs(x = 'free.sulfur.dioxide', y =' content(mg / dm^3)', 
+       title = 'Bargraph for free.sulfur.dioxide of red wines')
+  
+```
+
+```{r}
+summary(df$free.sulfur.dioxide)
+```
+红酒中酒中带硫元素的离子的含量集中在14mg / dm^3，大致呈现出正偏态分布。
+
+### 探索样本变量中的密度分布情况
+```{r , echo=FALSE}
+qplot(density, data = df)+labs(x = 'density', y = 'Content(g / dm^3)', 
+       title = 'Bargraph for density of red wines')
+```
+
+```{r , echo=FALSE}
+summary(df$density)
+
+```
+红酒中密度集中在14g / dm^3，大致呈现出正偏态分布。
+
+### 探索样本变量中的pH分布情况
+```{r , echo=FALSE}
+qplot(x= pH, data= df)+labs(x = 'pH', y = 'Content', 
+       title = 'Bargraph for pH of red wines')
+```
+
+```{r , echo=FALSE}
+summary(df$pH)
+
+```
+  
+红酒中pH值集中在3.31，大致呈现出正偏态分布。
+  
+### 探索样本变量中的硫酸盐分布情况
+```{r , echo=FALSE}
+qplot(sulphates, data = df)+
+  scale_x_continuous(breaks = seq(0.3,1.2,0.1), 
+                     limits = c(0.3,1.2))+labs(x = 'sulphates', y = 'Content(g / dm^3)', 
+       title = 'Bargraph for sulphates of red wines')
+```
+
+```{r , echo=FALSE}
+
+summary(df$sulphates)
+```
+红酒的的硫酸盐含量集中在0.62g / dm^3，大正呈现出正偏态分布
+
+
+### 探索样本变量中的酒精含量分布情况
+```{r , echo=FALSE}
+qplot(alcohol, data = df)+
+  scale_x_continuous(breaks = seq(8,14,1),
+                     limits = c(8,14))+labs(x = 'alcohol', y ='content(% by volume)', 
+       title = 'Bargraph for alcohol of red wines')
+```
+
+```{r , echo=FALSE}
+
+summary(df$alcohol)
+```
+
+红酒中酒精的含量集中在10.2% by volume，大致呈现出正偏态分布
+
+### 探索样本变量中的质量评分分布情况
+```{r , echo=FALSE}
+qplot(x= quality, data= df)+ labs(x = 'quality', y = 'Score', 
+       title = 'Bargraph for quality of red wines')
+```
+
+```{r , echo=FALSE}
+
+summary(df$quality)
+```
+
+红酒质量的评分，75%的评分小于6分，最低值为3分，最高值为8分，平均值为5.636分,分数集中在5-6分之间
+
+
+# Bivariate Plots Section
+
+### 探索柠檬酸和质量的关系
+```{r , echo=FALSE}
+ggplot(aes(x = factor(quality),
+           y = citric.acid),
+       data = df)+
+  geom_boxplot()+
+  stat_summary(fun.y = 'mean', 
+               geom = 'point',
+               color='red',
+               shape=8,
+               size=4)+
+  coord_trans(limy =c(0,0.8))+
+  ggtitle('The relationship between citric.acid and quality')+
+  # 设置Y轴标签
+  labs(y='citric.acid(g / dm^3)')
+
+```
+
+#由图可知，柠檬酸和红酒的质量呈现正相关，柠檬酸的含量越高，红酒的质量越高。
+
+### 探索密度和质量的关系
+```{r , echo=FALSE}
+
+ggplot(aes(x = factor(quality),
+           y = density),
+       data = df)+
+  geom_boxplot()+
+  stat_summary(fun.y = 'mean', 
+               geom = 'point',
+               color='red',
+               shape=8,
+               size=4)+
+  coord_trans(limy = c(0.9901,1.0025))+
+  ggtitle('The relationship between density and quality')+
+  # 设置Y轴标签
+  labs(y='density(g / dm^3)')
+
+```
+
+#由图可知，密度与红酒的质量大致呈现负相关，质量越高，密度越小，但密度对红酒质量的影响较小。
+
+### 探索酒精和质量的关系。
+```{r , echo=FALSE}
+#探索alcohol和quality的关系。
+ggplot(aes(x = factor(quality),
+           y = alcohol),
+       data = df)+
+  geom_boxplot()+
+  stat_summary(fun.y = 'mean', 
+               geom = 'point',
+               color='red',
+               shape=8,
+               size=4)+
+    ggtitle('The relationship between alcohlol and quality')+
+  # 设置Y轴标签
+  labs(y='alcohol(% by volum)')
+
+```
+
+#由上图可知，酒精浓度与红酒质量呈正相关，特别是5-8分质量的红酒中，质量越高的酒，酒精含量越高。
+
+### 探索硫酸盐和质量的关系。
+```{r , echo=FALSE}
+ggplot(aes(x = factor(quality),
+           y = sulphates),
+       data = df)+
+  geom_boxplot()+
+  stat_summary(fun.y = 'mean', 
+               geom = 'point',
+               color='red',
+               shape=8,
+               size=4)+
+coord_trans(limy = c(0.3,1.2))+
+    ggtitle('The relationship between sulphates and quality')+
+  # 设置Y轴标签
+  labs(y='sulphates(g / dm^3)')
+  
+```
+
+#硫酸盐与红酒的质量成正相关，质量越高的红酒，硫酸盐越高。
+
+### 探索固定酸和质量的关系
+```{r , echo=FALSE}
+ggplot(aes(x = factor(quality),
+           y = fixed.acidity),
+       data = df)+
+  geom_boxplot()+
+  stat_summary(fun.y = 'mean', 
+               geom = 'point',
+               color='red',
+               shape=8,
+               size=4)+
+  coord_trans(limy = c(4.5,13.5))+
+    ggtitle('The relationship between fixed.acidity and quality')+
+  # 设置Y轴标签
+  labs(y='fixed.acidity(g / dm^3)')
+
+```
+
+#由图可知，发现固定酸于红酒质量不具有明显关系。
+
+### 探索残糖和红酒质量的关系。
+```{r , echo=FALSE}
+ggplot(aes(x = factor(quality),
+           y = residual.sugar),
+       data = df)+
+  geom_boxplot()+
+  stat_summary(fun.y = 'mean', 
+               geom = 'point',
+               color='red',
+               shape=8,
+               size=4)+
+  coord_trans(limy =c(1,4.5))+
+      ggtitle('The relationship between residual.sugar and quality')+
+  # 设置Y轴标签
+  labs(y='residual.sugar(g / dm^3)')
+
+```
+
+#由图可知，发现残留糖分对红酒的质量影响不大。
+
+
+
+
+# Multivariate Plots Section
+
+
+### 探索柠檬酸、酒精和质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=citric.acid, 
+           y=alcohol,
+           color=factor(quality)))+
+  # 设置散点图大小
+  geom_point(size=1)+
+
+    # 添加平滑器
+  geom_smooth(method = 'lm', #设置为线性模型
+              se = FALSE, # 去掉拟合线的阴影
+              size=1)+  #设置平滑线大小
+  
+  # 配色
+  scale_color_brewer(type='div', 
+                     guide = guide_legend(title = 'Quality'))+  
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置标题
+  ggtitle('citric.acid and alcohol of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(x='citric.acid(g / dm^3)' , y='alcohol(% by volume)')
+
+```
+
+
+#由图可知，发现在柠檬酸一定下，降低酒精浓度，有助于提升质量。
+
+
+### 探索柠檬酸、硫酸盐和质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=citric.acid, 
+           y=sulphates,
+           color=factor(quality)))+
+ # 设置散点图大小
+  geom_point(size=.5)+
+  
+# 配色
+  scale_color_brewer(type='div',  
+                     guide = guide_legend(title = 'Quality'))+  # 设置图例
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置标题
+  ggtitle('citric.acid and sulphates of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(y='citric.acid (g/dm^3)', x='sulphates( g / dm3)')
+
+```
+
+
+#无法得出有意义结论
+
+### 探索硫酸盐、酒精和红酒质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=alcohol, 
+           y=sulphates,
+           color=factor(quality)))+
+   # 设置散点图大小
+  geom_point(size=1)+
+
+    # 添加平滑器
+  geom_smooth(method = 'lm', #设置为线性模型
+              se = FALSE, # 去掉拟合线的阴影
+              size=1)+  #设置平滑线大小
+  
+  
+  # 配色
+  scale_color_brewer(type='div',  
+                     guide = guide_legend(title = 'Quality'))+ 
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置图形标题
+  ggtitle('sulphates and alcohol of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(x='alcohol (% by volume)', y='sulphates(g/dm^3)')
+
+```
+
+
+#在酒精浓度一定时，提高硫酸盐的浓度有助于提高红酒质量。
+
+
+### 探索密度、酒精和质量的关系。
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=density, 
+           y=alcohol,
+           color=factor(quality)))+
+  # 设置散点图大小
+  geom_point(size=1)+
+
+    # 添加平滑器
+  geom_smooth(method = 'lm', #设置为线性模型
+              se = FALSE, # 去掉拟合线的阴影
+              size=1)+  #设置平滑线大小
+  
+  
+  
+  # 配色方案
+  scale_color_brewer(type='div',  
+                     guide = guide_legend(title = 'Quality'))+  # 设置图例
+  
+  # 加深图形的背景色
+  theme_dark()+
+  # 设置图形标题
+  ggtitle('Density and alcohol of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(x='density (g / cm^3)' ,y='alcohol (% by volume)')
+
+```
+
+
+#由图可知，酒精浓度一定的时候，降低密度有助于提升红酒品质。
+  
+### 探索密度、硫酸盐和质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=density, 
+           y=sulphates,
+           color=factor(quality)))+
+  # 设置散点图大小
+  geom_point(size=1)+
+
+    # 添加平滑器
+  geom_smooth(method = 'lm', #设置为线性模型
+              se = FALSE, # 去掉拟合线的阴影
+              size=1)+  #设置平滑线大小
+  
+  # 配色方案
+  scale_color_brewer(type='div',  
+                     guide = guide_legend(title = 'Quality'))+  # 设置图例
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置图形标题
+  ggtitle('density and sulphates of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(x='density (g / cm^3)', y='sulphates (g / dm3)')
+
+```
+
+
+#无法得出有效结论
+
+### 探索密度、硫酸盐和质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=density, 
+           y=sulphates,
+           color=factor(quality)))+
+ # 设置散点图大小
+  geom_point(size=.5)+
+ 
+  
+ 
+   # 配色方案
+  scale_color_brewer(type='div',  
+                     guide = guide_legend(title = 'Quality'))+  # 设置图例
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置图形标题
+  ggtitle('density and sulphates of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(x='density (g / cm^3)', y='sulphates (g / dm3)')
+
+```
+
+
+#由图可知，不能得出有效结论  
+  
+### 探索密度、柠檬酸和质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=density, 
+           y=citric.acid,
+           color=factor(quality)))+
+  # 设置散点图大小
+  geom_point(size=1)+
+
+    # 添加平滑器
+  geom_smooth(method = 'lm', #设置为线性模型
+              se = FALSE, # 去掉拟合线的阴影
+              size=1)+  #设置平滑线大小
+  
+  # 配色方案
+  scale_color_brewer(type='div', 
+                     guide = guide_legend(title = 'Quality'))+  # 设置图例
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置图形标题
+  ggtitle('Density and citric.acid of red wine based on Quality')+
+  # 设置Y轴标签
+  labs(x='density (g / cm^3)', y='citric acid (g / dm^3)')
+
+```
+
+
+#由图可知，发现在柠檬酸小于0.75时，降低密度有助于提高红酒质量.
+
+  
+# Final Plots and Summary
+
+
+
+### Plot One：探索酒精含量
+```{r , echo=FALSE}
+ qplot(alcohol, data = df)+
+    scale_x_continuous(breaks = seq(8,14,1),
+                       limits = c(8,14))+
+    # 填充颜色
+    geom_bar(color = "#696356",
+             fill = "#CACACA")+
+    # 设置标签及标题
+    labs(x = 'alcohol', y ='content(% by volume)', 
+         title = 'Bargraph for alcohol of red wines')
+
+```
+
+###Description Plot One
+#酒精含量呈正偏态分布。
+
+### Plot two：探索柠檬酸与酒精质量的关系
+```{r , echo=FALSE}
+ggplot(aes(x = quality ,
+           y = citric.acid),
+       data = df)+
+  # 通过geom_jitter添加抖动，并填充颜色
+  geom_jitter(color = "#73B4D2")+
+  # 将箱线图与散点图进行叠加，以变量quality进行分组，设置透明度
+  geom_boxplot(aes(group = quality),alpha = 0.4)+
+  
+  # 添加平滑器
+  geom_smooth(method = "lm", #将方法设置为lm,即线性模型
+              color = "red")+  #着色为红色
+  # 添加scale_x_continuous,设置breaks
+  
+  scale_x_continuous(breaks = seq(3,8,1))+
+  # 添加标签及标题
+  labs(x = "Quality",
+       y = "citric.acid(g / cm^3)",
+       title = "The linear relationship between citric.acid and quality ")
+
+```
+
+
+### Description Plot Two
+#柠檬酸与葡萄酒质量呈正相关
+
+
+### Plot Three： 探索柠檬酸、密度与红酒质量的关系
+```{r , echo=FALSE}
+ggplot(data = df,
+       aes(x=density, 
+           y=citric.acid,
+           color=factor(quality)))+
+  # 设置散点图大小
+  geom_point(size=2)+
+  # 添加平滑器
+  geom_smooth(method = 'lm', #设置线性模型
+              se = FALSE, # 去掉拟合线的阴影
+              size=2)+  #设置平滑线大小
+  
+  
+  # 配色方案
+  scale_color_brewer(type='div', 
+                     guide = guide_legend(title = 'Quality'))+  # 设置图例
+  
+  # 加深背景色
+  theme_dark()+
+  # 设置图形标题
+  ggtitle('Density and citric.acid of red wine based on Quality')+
+  # 设置标签
+  labs(x='density(g / cm^3)', y='citric.acid(g / cm^3)')
+
+```
+
+
+### Description Plot Three:在柠檬酸小于0.75时，降低密度有助于提高酒精质量.
+
+  
+### Reflection
+#本项目，主要探索葡萄酒里的化学成分对葡萄酒质量的影响。单变量分析时，对各变量都进行了探索，ph，密度，固定酸度，挥发性酸度，硫酸盐，酒精。后来双变量分析时越来越清晰，了解到柠檬酸与葡萄酒质量正相关系关，最后多变量分析时，了解到酒精浓度一定的时候，降低密度有助于提升红酒品质。
+
+#挫折或成功：开始分析会没有方向没尝试了很多变量关系，对于这些变量的对于红酒的作用也不是很了解，所以存在盲目猜测的状态。但是再后来收集资料的过程中总结出，不同变量的作用，对探索红酒质量的项目分析有了更多的了解。
+
+#fixed.acidity：该变量指的是葡萄酒中的固定或者非挥发性酸度
+
+#volatile.acidity：挥发酸，葡萄酒中的醋酸含量过高，会导致醋的味道不愉快。
+
+#citric.acid：柠檬酸，柠檬酸含量小，能给葡萄酒增添新鲜感和风味。
+
+#residual.sugar：剩余糖分，发酵结束后剩下的糖分，很少发现低于1克/升的葡萄酒，超过45克/升的葡萄酒被认为是甜的。
+
+#chlorides：酒中的盐量。
+
+#free.sulfur.dioxide：酒中带硫元素的离子，它可以防止微生物的生长和葡萄酒的氧化。
+
+#total.sulfur.dioxide:二氧化硫，低浓度时检测不到，当浓度超过50 ppm时用鼻子可以闻到。
+
+#density：密度，大致接近于水，具体取决于酒精和糖的含量。
+
+#pH：用于描述酒的酸碱度。
+
+#sulphates：硫酸盐，葡萄酒的添加剂，用于控制二氧化硫比例。
+
+#alcohol：酒中的酒精浓度。
+
+#quality：酒的质量，从0到10分不等。
+
+
+
+#建议：在探究红酒质量过程中，应该更多的加入对不同指标的理解，特别是不同指标在红酒中的具体功能与作用。这样分析会更加有方向性。另外需要注意的是，这个质量的评分是有主观性的，因此结论不完全代表影响葡萄酒质量的真实原因。加入设计评分不同指标标准，会更好。当然，横向比较也可以尝试，例如影响白酒、白葡萄酒等类型酒酒品质量的因素，也有助于对本次红酒质量的分析。
+
+
+
+save(df,file='~/Desktop/R-analysis.R'）
